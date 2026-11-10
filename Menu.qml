@@ -231,7 +231,7 @@ Item {
   }
 
   function rowListHeight(_serial, _count, _filter, _divider) {
-    if (displayModel.count === 0) return root.baseRowHeight
+    if (displayModel.count === 0) return root.baseRowHeight + Style.spacing.md
 
     var totals = []
     var total = 0
@@ -1784,31 +1784,19 @@ Item {
             }
           }
 
-          Column {
+          // Nothing to show: one plain line, as the app list says it.
+          Text {
             anchors.centerIn: parent
-            spacing: Style.space(8)
             visible: displayModel.count === 0 && root.mode !== "input"
-
-            Text {
-              text: "󰈉"
-              color: root.selectedText
-              opacity: 0.8
-              font.family: root.fontFamily
-              font.pixelSize: Style.font.displayLarge
-              horizontalAlignment: Text.AlignHCenter
-              width: Style.space(320)
-            }
-
-            Text {
-              textFormat: Text.PlainText
-              text: root.filterText ? Commons.I18n.t("common.noMatchesFor").arg(root.filterText) : Commons.I18n.t("menu.nothingHere")
-              color: root.foreground
-              opacity: 0.7
-              font.family: root.textFamily
-              font.pixelSize: Style.font.title
-              horizontalAlignment: Text.AlignHCenter
-              width: Style.space(320)
-            }
+            width: parent.width - Style.space(24)
+            horizontalAlignment: Text.AlignHCenter
+            textFormat: Text.PlainText
+            text: root.filterText ? 'No apps matching "' + root.filterText.slice(0, 80) + '"' : Commons.I18n.t("menu.nothingHere")
+            color: root.foreground
+            opacity: 0.7
+            font.family: root.textFamily
+            font.pixelSize: Style.font.body
+            elide: Text.ElideRight
           }
         }
 
