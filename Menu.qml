@@ -148,6 +148,12 @@ Item {
   // read as a cut-off row rather than a bottom border.
   property int rowPeek: Math.round(baseRowHeight * 0.55)
   property int rowSpacing: 0
+  // Turned over for a bottom bar: the search line at the bottom, the results
+  // growing up from it with the best match nearest it.
+  readonly property bool flipped: corner.position === "bottom"
+  // Only search results run upward from the line; the menu's own items keep
+  // their order, top to bottom.
+  readonly property bool listFlipped: flipped && filterText.length > 0
   property int dividerHeight: Style.space(9)
   property bool searchDivider: false
   property int layoutSerial: 0
@@ -805,6 +811,9 @@ Item {
     if (displayModel.count === 0) return
     resultList.positionViewAtIndex(root.selectedIndex, ListView.Contain)
 
+    // The peek below works out from a list that runs downward.
+    if (root.listFlipped) return
+
     var item = resultList.itemAtIndex(root.selectedIndex)
     if (!item) return
 
@@ -1386,16 +1395,16 @@ Item {
             root.goBack()
             event.accepted = true
           } else if (event.key === Qt.Key_Up) {
-            root.select(-1)
+            root.select(root.listFlipped ? 1 : -1)
             event.accepted = true
           } else if (event.key === Qt.Key_Down) {
-            root.select(1)
+            root.select(root.listFlipped ? -1 : 1)
             event.accepted = true
           } else if (event.key === Qt.Key_PageUp) {
-            root.select(-6)
+            root.select(root.listFlipped ? 6 : -6)
             event.accepted = true
           } else if (event.key === Qt.Key_PageDown) {
-            root.select(6)
+            root.select(root.listFlipped ? -6 : 6)
             event.accepted = true
           } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || Util.readingKey(event) === Qt.Key_Right) {
             if (root.dmenuActive) {
@@ -1427,15 +1436,15 @@ Item {
         }
       }
 
-      Column {
+      Item {
         anchors.fill: parent
         anchors.topMargin: card.contentTopInset
         anchors.rightMargin: card.contentRightInset
         anchors.bottomMargin: card.contentBottomInset
         anchors.leftMargin: card.contentLeftInset
-        spacing: root.contentSpacing
 
         Rectangle {
+          y: root.flipped ? parent.height - height : 0
           width: parent.width
           height: root.headerHeight
           radius: root.cornerRadius
@@ -1512,6 +1521,7 @@ Item {
         }
 
         Item {
+          y: root.flipped ? 0 : root.headerHeight + root.contentSpacing
           width: parent.width
           height: root.visibleRowsHeight
 
@@ -1520,6 +1530,7 @@ Item {
             anchors.fill: parent
             model: displayModel
             clip: true
+            verticalLayoutDirection: root.listFlipped ? ListView.BottomToTop : ListView.TopToBottom
             spacing: root.rowSpacing
             boundsBehavior: Flickable.StopAtBounds
 
