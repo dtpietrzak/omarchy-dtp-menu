@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.dtpietrzak.menu",
+  "name": "DTP Omarchy menu",
+  "version": "1.0.0",
+  "author": "dtpietrzak",
+  "license": "MIT",
+  "description": "The Omarchy menu restyled like the workspace control menus, opening in the corner beside the menu button.",
+  "kinds": ["menu", "bar-widget"],
+  "keepLoaded": true,
+  "entryPoints": {
+    "menu": "Menu.qml",
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "DTP Omarchy menu",
+    "description": "Launches the Omarchy menu",
+    "category": "Compositor",
+    "allowMultiple": false
+  },
+  "omarchy": {
+    "clonedFrom": "omarchy.menu"
+  },
+  "homepage": "https://github.com/dtpietrzak/omarchy-dtp-menu"
+}
