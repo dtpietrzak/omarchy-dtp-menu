@@ -7,7 +7,9 @@ The Omarchy menu (Super+Space and the bar button) restyled to match the workspac
 - The card background follows the bar (opaque, glassy or clear), with blur behind it when the bar is glassy.
 - Icons are 1.5x the body text size. Labels are body size and the search line is title size.
 
-Menu behavior is Omarchy's own code. Only the look and placement changed (see `diff upstream/Menu.qml Menu.qml`). The manifest marks this as a clone of `omarchy.menu`, so it replaces the stock menu while enabled, and `omarchy plugin remove io.github.dtpietrzak.menu` brings the stock one back.
+- App rows have a star on the right that marks the app as a favorite, shared with the DTP app list and shown on the bar by [omarchy-dtp-favorites](https://github.com/dtpietrzak/omarchy-dtp-favorites). Grey, white under the pointer, gold when favorited.
+
+Menu behavior is Omarchy's own code. Only the look, placement and the favorite star changed (see `diff upstream/Menu.qml Menu.qml`). The manifest marks this as a clone of `omarchy.menu`, so it replaces the stock menu while enabled, and `omarchy plugin remove io.github.dtpietrzak.menu` brings the stock one back.
 
 ```bash
 omarchy plugin add https://github.com/dtpietrzak/omarchy-dtp-menu.git --enable

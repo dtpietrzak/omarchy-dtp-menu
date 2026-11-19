@@ -7,6 +7,7 @@ import qs.Commons
 import qs.Commons as Commons
 import qs.Ui
 import "MenuModel.js" as MenuModel
+import "Favorites.js" as Favorites
 
 Item {
   id: root
@@ -764,6 +765,15 @@ Item {
 
       currentRows.sort(searchSort)
       drilldownRows.sort(searchSort)
+      // Favorite apps go first, beside the search field, above any divider.
+      var starred = function(rows) {
+        return rows.filter(function(row) { return row.kind === "app" && favorites.isFavorite(row.appId) })
+      }
+      var unstarred = function(rows) {
+        return rows.filter(function(row) { return !(row.kind === "app" && favorites.isFavorite(row.appId)) })
+      }
+      currentRows = starred(currentRows).concat(starred(drilldownRows), unstarred(currentRows))
+      drilldownRows = unstarred(drilldownRows)
       root.searchDivider = currentRows.length > 0 && drilldownRows.length > 0
       if (root.searchDivider) {
         for (var d = 0; d < drilldownRows.length; d++) drilldownRows[d].section = "drilldown"
@@ -791,6 +801,8 @@ Item {
           if (aId > bId) return 1
           return 0
         })
+        // Favorites first: the first row sits beside the search field.
+        rows = Favorites.favoritesFirst(rows, function(row) { return row.appId }, favorites.map)
       }
     }
 
@@ -1297,6 +1309,12 @@ Item {
   }
   StartCorner { id: corner }
 
+  // Shared with the favorites bar widget and the DTP app list.
+  FavoritesStore {
+    id: favorites
+    onAppsChanged: if (root.opened) root.rebuildDisplay()
+  }
+
   // The blur rule for a glassy bar, which Hyprland forgets on every reload.
   function setUpHyprland() {
     var path = decodeURIComponent(String(Qt.resolvedUrl("hypr/menu.lua")).replace(/^file:\/\//, ""))
@@ -1697,11 +1715,22 @@ Item {
 
               Row {
                 id: trail
-                width: Style.space(14)
+                // Over the row's mouse area, so the star takes its own click.
+                z: 1
+                width: row.isApp ? Math.max(Style.space(14), appStar.width) : Style.space(14)
                 anchors.right: parent.right
                 anchors.rightMargin: Style.spacing.md
                 y: contentColumn.y + labelText.y + (labelText.height - height) / 2
                 spacing: 0
+
+                Star {
+                  id: appStar
+                  visible: row.isApp
+                  anchors.verticalCenter: parent.verticalCenter
+                  size: Math.round(root.glyphSize * 0.7)
+                  favorited: row.isApp && favorites.isFavorite(row.appId)
+                  onToggled: favorites.toggle(row.appId)
+                }
 
                 Text {
                   textFormat: Text.PlainText
